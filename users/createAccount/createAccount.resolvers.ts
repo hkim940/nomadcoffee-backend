@@ -1,4 +1,4 @@
-import client from '../src/client';
+import client from '../../src/client';
 import bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 

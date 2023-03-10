@@ -8,7 +8,7 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const loadedTypes = await loadFiles(`${__dirname}/../**/*.typeDefs.ts`);
-const loadedResolvers = await loadFiles(`${__dirname}/../**/*.{queries,mutations}.ts`);
+const loadedResolvers = await loadFiles(`${__dirname}/../**/*.resolvers.ts`);
 
 const typeDefs = mergeTypeDefs(loadedTypes);
 const resolvers = mergeResolvers(loadedResolvers);
