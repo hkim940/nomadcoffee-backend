@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { protectedResolver } from '../users.utils';
 import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs'
-import { createWriteStream } from 'fs';
+import { createWriteStream, ReadStream } from 'fs';
 
 
 const saltRounds: number = 10;
@@ -16,20 +16,25 @@ const resolverFn = async (_, {
     password: newPassword,
     location,
     githubUsername,
-    avatarURL
+    avatarURL,
 }, 
 { loggedInUser } // Object that is going to be available to EVERY resolvers
 ) => {
-    const { filename, createReadStream } = await avatarURL;
-    const readStream = createReadStream();
-    const writeStream = createWriteStream(process.cwd() + "/uploads/" + filename);
-    // Read File and pipe it to another stream which will write the file to designated folder
-    readStream.pipe(writeStream);
+    let updatedAvatarURL: string | null = null;
+    if (avatarURL) {
+        const { filename, createReadStream } = await avatarURL;
+        const newFileName : string = `${loggedInUser.id}-${Date.now()}-${filename}`
+        const readStream  : ReadStream = createReadStream();
+        const writeStream = createWriteStream(process.cwd() + "/uploads/" + newFileName);
+        // Read File and pipe it to another stream which will write the file to designated folder
+        readStream.pipe(writeStream);
+        updatedAvatarURL = `http://localhost:4000/static/${newFileName}`
+    }
 
     // If user is not logged in we do not want them to go beyond this point
     let hashedpwd: string | null = null;
     if (newPassword) {
-    hashedpwd = await bcrypt.hash( newPassword, saltRounds )
+        hashedpwd = await bcrypt.hash( newPassword, saltRounds )
     }
     const updatedUser: User | null = await client.user.update({
         where: { 
@@ -39,10 +44,11 @@ const resolverFn = async (_, {
             firstName, 
             username,
             email, 
-            ...(lastName  && { lastName }),
+            ...(lastName && { lastName }),
             ...(githubUsername && { githubUsername }),
             ...(location && { location: location }),
-            ...(hashedpwd && { password: hashedpwd })
+            ...(hashedpwd && { password: hashedpwd }),
+            ...(updatedAvatarURL && { avatarURL: updatedAvatarURL })
         }
     })
     if (updatedUser.id) {
