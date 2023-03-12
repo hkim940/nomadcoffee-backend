@@ -11,9 +11,9 @@ export default `#graphql
             username:       String!
             email:          String!
             password:       String!
-            location:       String!
-            avatarURL:      String!
-            githubUsername: String!
+            location:       String
+            avatarURL:      String
+            githubUsername: String
         ): CreateAccountResult!
     }
 `

@@ -2,6 +2,9 @@ import client from '../../src/client';
 import bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { protectedResolver } from '../users.utils';
+import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs'
+import { createWriteStream } from 'fs';
+
 
 const saltRounds: number = 10;
 
@@ -13,11 +16,17 @@ const resolverFn = async (_, {
     password: newPassword,
     location,
     githubUsername,
+    avatarURL
 }, 
-{ loggedInUser, protectResolver } // Object that is going to be available to EVERY resolvers
+{ loggedInUser } // Object that is going to be available to EVERY resolvers
 ) => {
+    const { filename, createReadStream } = await avatarURL;
+    const readStream = createReadStream();
+    const writeStream = createWriteStream(process.cwd() + "/uploads/" + filename);
+    // Read File and pipe it to another stream which will write the file to designated folder
+    readStream.pipe(writeStream);
+
     // If user is not logged in we do not want them to go beyond this point
-    protectResolver(loggedInUser)
     let hashedpwd: string | null = null;
     if (newPassword) {
     hashedpwd = await bcrypt.hash( newPassword, saltRounds )
@@ -48,6 +57,7 @@ const resolverFn = async (_, {
     }
 }
 export default {
+    Upload: GraphQLUpload,
     Mutation:  {
         editProfile: protectedResolver(resolverFn)
     }

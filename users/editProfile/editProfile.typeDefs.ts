@@ -1,4 +1,6 @@
 export default `#graphql 
+    scalar Upload 
+    
     type EditProfileResult {
         ok:     Boolean!
         error:  String
@@ -12,7 +14,7 @@ export default `#graphql
             email:          String
             password:       String
             location:       String
-            avatarURL:      String
+            avatarURL:      Upload
             githubUsername: String
         ): EditProfileResult
     }
