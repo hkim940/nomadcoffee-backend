@@ -8,5 +8,9 @@ NomadCoffee Project utilizing Prisma and GraphQL;
 - [x] Login
 - [x] Edit Profile 
 - [x] Change Avatar (Image upload)
-- [ ] Follow User
-- [ ] Unfollow User
+- [x] Follow User
+- [x] Unfollow User
+- [x] View Followers w / Paginations
+- [x] View Following w / Paginations
+- [x] Computed Fileds
+- [x] Search Users

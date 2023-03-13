@@ -8,13 +8,14 @@ export default {
     Mutation: {
         createAccount: async (_, {
             firstName,
+            lastName,
             username,
             email, 
             password,
             location,
             avatarURL,
             githubUsername
-        }): Promise<User> => {
+        }) => {
             try {
                 // User should never see DB Error
                 // We need to check uniquness of email & username before we create an account
@@ -33,19 +34,22 @@ export default {
                 if (existingUser) throw new Error("This username / email is already taken");
                 // Hash password before submitting to DB
                 const hashedPwd: string = await bcrypt.hash(password, saltRounds);  
-                return client.user.create({ data: {
+                await client.user.create({ data: {
                     firstName, 
                     username, 
                     email, 
-                    password: 
-                    hashedPwd, 
-                    location, 
-                    avatarURL, 
-                    githubUsername
-                }
-            })
+                    password: hashedPwd, 
+                    ...(lastName && { lastName }),
+                    ...(githubUsername && { githubUsername }),
+                    ...(location && { location: location }),
+                    ...(avatarURL && { avatarURL })
+                }})
+                return { ok: true }
             } catch(e) {
-                return e;
+                return {
+                    ok: false,
+                    error: "Error: Could not create user"
+                }
             }
         }
     }
