@@ -20,8 +20,33 @@ model User {
   location        String?
   avatarURL       String?
   githubUsername  String?
+  coffeeShops     CoffeeShop[]
   followers       User[]   @relation("FollowRelation")
   following       User[]   @relation("FollowRelation")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model CoffeeShopPhoto {
+  id              Int       @id @default(autoincrement())
+  url             String
+  shop            CoffeeShop[]
+}
+
+model CoffeeShop {
+  id              Int       @id @default(autoincrement())
+  name            String
+  latitude        String
+  longitude       String
+  user            User      @relation(fields: [userId], references: [id])
+  userId          Int    
+  photos          CoffeeShopPhoto[]
+  categories      Category[]
+}
+
+model Category {
+  id              Int       @id @default(autoincrement())
+  category        String    @unique
+  slug            String?
+  shops           CoffeeShop[]
 }

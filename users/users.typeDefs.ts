@@ -7,6 +7,7 @@ export default `#graphql
         email:              String!
         location:           String
         avatarURL:          String
+        coffeeShops:        [CoffeeShop]
         githubUsername:     String
         createdAt:          String!
         updatedAt:          String!
